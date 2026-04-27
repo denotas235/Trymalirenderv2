@@ -3,7 +3,8 @@
   "package": "com.malioptrender2v.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "MaliOptimizationMixin"
+    "MaliOptimizationMixin",
+    "MaliShaderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
