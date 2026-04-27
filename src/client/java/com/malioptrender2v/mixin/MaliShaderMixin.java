@@ -12,14 +12,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MaliShaderMixin {
     @Inject(method = "initRenderSystem", at = @At("TAIL"))
     private static void onInit(CallbackInfo ci) {
-        try {
-            if (MaliHardware.INSTANCE.getHasParallelCompile()) {
+        if (MaliHardware.INSTANCE.getHasParallelCompile()) {
+            try {
                 // 0x8DA1 = GL_MAX_SHADER_COMPILER_THREADS_ARB
-                // Usamos 4 threads para o Mali-G52 equilibrar consumo/performance
                 GL11.glHint(0x8DA1, 4);
-            }
-        } catch (Exception e) {
-            // Se o driver falhar, o jogo continua normalmente sem a otimização
+            } catch (Exception ignored) {}
         }
     }
 }
