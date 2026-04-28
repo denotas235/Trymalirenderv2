@@ -10,6 +10,7 @@ version = providers.gradleProperty("mod_version").get()
 group = providers.gradleProperty("maven_group").get()
 
 repositories {
+    mavenCentral()
 }
 
 loom {
@@ -31,7 +32,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${providers.gradleProperty("fabric_kotlin_version").get()}")
-
+    compileOnly("org.lwjgl:lwjgl-vulkan:3.3.3")
 }
 
 tasks.processResources {
