@@ -10,10 +10,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelRenderer.class)
 public class MaliCullingMixin {
-    @Inject(method = "prepareCull", at = @At("HEAD"))
-    private void mali_SFCRS_Culling(Camera camera, Frustum frustum, boolean updateFrustum, CallbackInfo ci) {
-        // SFCRS: Otimização de frustum para GPUs de baixo consumo
-        // Se a câmera não se moveu significativamente, podemos reutilizar dados
-        // reduzindo o stress no barramento LPDDR4X do Tecno KH7.
+    // Usamos o mapeamento do método direto para evitar falhas de refmap
+    @Inject(method = "prepareCull", at = @At("HEAD"), remap = true)
+    private void mali_SFCRS_Culling(Camera camera, Frustum frustum, boolean bl, CallbackInfo ci) {
+        // Lógica de culling
     }
 }
