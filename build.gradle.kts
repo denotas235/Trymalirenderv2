@@ -1,83 +1,82 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-id("net.fabricmc.fabric-loom") version "${providers.gradleProperty("loom_version").get()}"
-`maven-publish`
-id("org.jetbrains.kotlin.jvm") version "2.3.21"
+    id("net.fabricmc.fabric-loom") version "1.7-SNAPSHOT"
+    `maven-publish`
+    id("org.jetbrains.kotlin.jvm") version "2.0.0"
 }
 
-version = providers.gradleProperty("mod_version").get()
-group = providers.maven_group.get()
+version = "1.0.0"
+group = "com.malioptrender2v"
 
 base {
-archivesName.set(providers.gradleProperty("archives_base_name").get())
+    archivesName.set("malioptrender2v")
 }
 
 loom {
-splitEnvironmentSourceSets()
+    splitEnvironmentSourceSets()
 
-mods {
-register("malioptrenderv2") {
-sourceSet(sourceSets.main.get())
-sourceSet(sourceSets.getByName("client"))
-}
-}
+    mods {
+        register("malioptrender2v") {
+            sourceSet(sourceSets.main.get())
+            sourceSet(sourceSets.getByName("client"))
+        }
+    }
 
-// ADICIONADO PARA CORRIGIR O CRASH DO REFMAP
-mixin {
-defaultRefmapName.set("malioptrenderv2.refmap.json")
-}
+    mixin {
+        defaultRefmapName.set("malioptrenderv2.refmap.json")
+    }
 }
 
 fabricApi {
-configureDataGeneration {
-client = true
-}
+    configureDataGeneration {
+        client = true
+    }
 }
 
 dependencies {
-minecraft("com.mojang:minecraft:${providers.gradleProperty("minecraft_version").get()}")
-mappings(loom.officialMojangMappings())
-modImplementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
-modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
-modImplementation("net.fabricmc:fabric-language-kotlin:${providers.gradleProperty("fabric_kotlin_version").get()}")
+    minecraft("com.mojang:minecraft:1.21.11")
+    mappings(loom.officialMojangMappings())
+    modImplementation("net.fabricmc:fabric-loader:0.16.7")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:0.106.1+1.21.1")
+    modImplementation("net.fabricmc:fabric-language-kotlin:1.12.1+kotlin.2.0.0")
 }
 
 tasks.processResources {
-inputs.property("version", project.version)
-filesMatching("fabric.mod.json") {
-expand("version" to project.version)
-}
+    inputs.property("version", project.version)
+    filesMatching("fabric.mod.json") {
+        expand("version" to project.version)
+    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
-options.release.set(21)
+    options.release.set(21)
 }
 
 kotlin {
-compilerOptions {
-jvmTarget.set(JvmTarget.JVM_21)
-}
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+    }
 }
 
 java {
-withSourcesJar()
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.jar {
-val projectName = project.name
-inputs.property("projectName", projectName)
-from("LICENSE") {
-rename { "${it}_$projectName" }
-}
+    val projectName = project.name
+    inputs.property("projectName", projectName)
+    from("LICENSE") {
+        rename { "${it}_$projectName" }
+    }
 }
 
 publishing {
-publications {
-register<MavenPublication>("mavenJava") {
-from(components["java"])
-}
-}
+    publications {
+        register<MavenPublication>("mavenJava") {
+            from(components["java"])
+        }
+    }
 }
