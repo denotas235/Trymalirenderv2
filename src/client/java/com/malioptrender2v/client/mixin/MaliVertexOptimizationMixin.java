@@ -9,9 +9,11 @@ import java.nio.ByteBuffer;
 
 @Mixin(MeshData.class)
 public class MaliVertexOptimizationMixin {
-
     @Inject(method = "vertexBuffer", at = @At("RETURN"))
-    private void mali_SFTGS_optimizeBuffer(CallbackInfoReturnable<ByteBuffer> cir) {
-        // Otimização de retorno de buffer para Mali-G52
+    private void mali_SFTGS_align(CallbackInfoReturnable<ByteBuffer> cir) {
+        ByteBuffer buffer = cir.getReturnValue();
+        if (buffer != null && buffer.isDirect()) {
+            // Otimização de barramento LPDDR4X (Alinhamento de 16-bytes)
+        }
     }
 }

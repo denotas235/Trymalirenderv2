@@ -16,27 +16,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ModelBlockRenderer.class)
 public class MaliModelRendererMixin {
-
     @Inject(
         method = "putQuadData(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;Lnet/minecraft/client/renderer/block/ModelBlockRenderer$CommonRenderStorage;I)V",
         at = @At("HEAD"),
-        remap = true
+        remap = true,
+        cancellable = true
     )
-    private void mali_SFTGS_optimizeQuad(
-        BlockAndTintGetter level,
-        BlockState state,
-        BlockPos pos,
-        VertexConsumer vertexConsumer,
-        PoseStack.Pose pose,
-        BakedQuad bakedQuad,
-        @Coerce Object storage, // @Coerce resolve o erro de 'private access'
-        int light,
-        CallbackInfo ci
-    ) {
-        // direction() como método de Record Java 21
+    private void mali_SFTGS_optimizeQuad(BlockAndTintGetter level, BlockState state, BlockPos pos, VertexConsumer vertexConsumer, PoseStack.Pose pose, BakedQuad bakedQuad, @Coerce Object storage, int light, CallbackInfo ci) {
         Direction dir = bakedQuad.direction();
-        if (dir == null) return;
-
-        // Fase 2: Ponto de entrada validado para o SFTGS
+        if (dir != null && !BlockState.shouldRenderFace(state, level, pos, dir, pos.relative(dir))) {
+            ci.cancel(); // Descarta a face se ela estiver escondida por outro bloco
+        }
     }
 }
