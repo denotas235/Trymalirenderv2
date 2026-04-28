@@ -1,15 +1,16 @@
 pluginManagement {
     repositories {
-        maven { url = uri("https://maven.fabricmc.net/") }
+        maven {
+            name = "Fabric"
+            url = uri("https://maven.fabricmc.net/")
+        }
         mavenCentral()
         gradlePluginPortal()
     }
-}
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        mavenCentral()
-        maven { url = uri("https://maven.fabricmc.net/") }
+
+    plugins {
+        id("net.fabricmc.fabric-loom-remap") version providers.gradleProperty("loom_version")
     }
 }
+
 rootProject.name = "malioptrenderv2"
