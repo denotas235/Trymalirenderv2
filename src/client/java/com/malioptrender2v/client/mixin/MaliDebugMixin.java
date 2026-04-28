@@ -14,7 +14,7 @@ public abstract class MaliDebugMixin {
     private void mali_addDebugInfo(GuiGraphics guiGraphics, List<String> list, boolean leftSide, CallbackInfo ci) {
         if (leftSide) { // Adiciona apenas na coluna da esquerda
             list.add("");
-            list.add("§6[MaliOpt V2]§r SFCRS: §aON§r | SFTGS: §eIDLE§r");
+            list.add("§6[MaliOpt V2]§r SFCRS: §aON§r | SFTGS: §aON§r");
             list.add("§7Hardware: ARM Mali-G52 (TECNO KH7)§r");
         }
     }

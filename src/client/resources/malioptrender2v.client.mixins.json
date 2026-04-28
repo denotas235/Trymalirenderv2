@@ -10,6 +10,7 @@
     "MaliCullingMixin",
     "MaliBufferStorageMixin",
     "MaliDebugMixin"
+    "MaliTerrainMixin",
   ],
   "injectors": { "defaultRequire": 1 }
 }
