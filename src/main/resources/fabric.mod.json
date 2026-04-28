@@ -1,51 +1,33 @@
 {
-	"schemaVersion": 1,
-	"id": "malioptrenderv2",
-	"version": "${version}",
-	"name": "Malioptrenderv2",
-	"description": "This is an example description! Tell everyone what your mod is about!",
-	"authors": [
-		"Me!"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/malioptrenderv2/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			{
-				"value": "com.malioptrender2v.Malioptrenderv2",
-				"adapter": "kotlin"
-			}
-		],
-		"client": [
-			{
-				"value": "com.malioptrender2v.client.Malioptrenderv2Client",
-				"adapter": "kotlin"
-			}
-		],
-		"fabric-datagen": [
-			{
-				"value": "com.malioptrender2v.client.Malioptrenderv2DataGenerator",
-				"adapter": "kotlin"
-			}
-		]
-	},
-	"mixins": [
-		"malioptrenderv2.mixins.json",
-		{
-			"config": "malioptrenderv2.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.19.2",
-		"minecraft": "~1.21.11",
-		"java": ">=21",
-		"fabric-api": "*",
-		"fabric-language-kotlin": "*"
-	}
+  "schemaVersion": 1,
+  "id": "malioptrenderv2",
+  "version": "${version}",
+  "name": "MaliOptRender V2",
+  "description": "Detector de extensões OpenGL e Vulkan para Mali-G52 MC2",
+  "authors": ["DENOTAS"],
+  "license": "CC0-1.0",
+  "icon": "assets/malioptrenderv2/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      {
+        "value": "com.malioptrender2v.client.Malioptrenderv2Client",
+        "adapter": "kotlin"
+      }
+    ]
+  },
+  "mixins": [
+    "malioptrenderv2.mixins.json",
+    {
+      "config": "malioptrenderv2.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.2",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*",
+    "fabric-language-kotlin": "*"
+  }
 }

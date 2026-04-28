@@ -14,22 +14,14 @@ repositories {
 
 loom {
     splitEnvironmentSourceSets()
-
     mods {
         register("malioptrenderv2") {
             sourceSet(sourceSets.main.get())
             sourceSet(sourceSets.getByName("client"))
         }
     }
-
     mixin {
         defaultRefmapName.set("malioptrenderv2.refmap.json")
-    }
-}
-
-fabricApi {
-    configureDataGeneration {
-        client = true
     }
 }
 
@@ -39,12 +31,12 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${providers.gradleProperty("fabric_kotlin_version").get()}")
+    implementation("org.lwjgl:lwjgl-vulkan")
 }
 
 tasks.processResources {
     val version = version
     inputs.property("version", version)
-
     filesMatching("fabric.mod.json") {
         expand("version" to version)
     }
@@ -69,7 +61,6 @@ java {
 tasks.jar {
     val projectName = project.name
     inputs.property("projectName", projectName)
-
     from("LICENSE") {
         rename { "${it}_$projectName" }
     }
