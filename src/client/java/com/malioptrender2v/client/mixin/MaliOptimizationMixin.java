@@ -1,4 +1,4 @@
-package com.malioptrender2v.mixin;
+package com.malioptrender2v.client.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -1,4 +1,4 @@
-package com.malioptrender2v.mixin;
+package com.malioptrender2v.client.mixin;
 
 import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
 import net.minecraft.client.renderer.chunk.CompiledSectionMesh;

@@ -1,4 +1,4 @@
-package com.malioptrender2v.mixin;
+package com.malioptrender2v.client.mixin;
 
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.Camera;

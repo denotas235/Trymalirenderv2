@@ -1,4 +1,4 @@
-package com.malioptrender2v.mixin;
+package com.malioptrender2v.client.mixin;
 
 import com.malioptrender2v.client.MaliHardware;
 import org.spongepowered.asm.mixin.Mixin;
