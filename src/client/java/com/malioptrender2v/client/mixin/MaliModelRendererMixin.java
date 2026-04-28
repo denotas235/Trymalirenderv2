@@ -1,4 +1,5 @@
 package com.malioptrender2v.client.mixin;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -24,7 +25,7 @@ public class MaliModelRendererMixin {
     )
     private void mali_SFTGS_optimizeQuad(BlockAndTintGetter level, BlockState state, BlockPos pos, VertexConsumer vertexConsumer, PoseStack.Pose pose, BakedQuad bakedQuad, @Coerce Object storage, int light, CallbackInfo ci) {
         Direction dir = bakedQuad.direction();
-        if (dir != null && !BlockState.shouldRenderFace(state, level, pos, dir, pos.relative(dir))) {
+        if (dir != null && !ModelBlockRenderer.shouldRenderFace(level, state, false, dir, pos.relative(dir))) {
             ci.cancel(); // Descarta a face se ela estiver escondida por outro bloco
         }
     }
