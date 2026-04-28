@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ModelBlockRenderer.class)
@@ -28,14 +29,14 @@ public class MaliModelRendererMixin {
         VertexConsumer vertexConsumer,
         PoseStack.Pose pose,
         BakedQuad bakedQuad,
-        ModelBlockRenderer.CommonRenderStorage storage,
+        @Coerce Object storage, // @Coerce resolve o erro de 'private access'
         int light,
         CallbackInfo ci
     ) {
-        // Acesso correto via método de record conforme mappings
+        // direction() como método de Record Java 21
         Direction dir = bakedQuad.direction();
         if (dir == null) return;
 
-        // Fase 2: Ponto de entrada validado para o SFTGS no TECNO KH7
+        // Fase 2: Ponto de entrada validado para o SFTGS
     }
 }
