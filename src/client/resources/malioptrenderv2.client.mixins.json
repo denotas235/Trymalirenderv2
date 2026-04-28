@@ -9,7 +9,11 @@
     "MaliLightTextureMixin",
     "MaliCullingMixin",
     "MaliBufferStorageMixin",
-    "MaliDebugMixin"
+    "MaliDebugMixin",
+    "MaliTerrainMixin",
+    "MaliVertexOptimizationMixin",
+    "MaliModelRendererMixin",
+    "MaliLightFetchMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }
