@@ -126,10 +126,9 @@ object MaliHardware {
     private fun checkOpenGL() {
         GL_EXT_SET.clear()
 
-        // Ler info do renderer
-        val renderer = GL11.glGetString(GL11.GL_RENDERER) ?: ""
-        val glVersion = GL11.glGetString(GL11.GL_VERSION) ?: ""
-        val vendor = GL11.glGetString(GL11.GL_VENDOR) ?: ""
+        val renderer  = GL11.glGetString(GL11.GL_RENDERER) ?: ""
+        val glVersion = GL11.glGetString(GL11.GL_VERSION)  ?: ""
+        val vendor    = GL11.glGetString(GL11.GL_VENDOR)   ?: ""
 
         LOGGER.info("════════════════════════════════════════")
         LOGGER.info("  MALIOPT — INFO HARDWARE")
@@ -138,23 +137,23 @@ object MaliHardware {
         LOGGER.info("  Vendor:   $vendor")
         LOGGER.info("════════════════════════════════════════")
 
-        // Detetar GPU e Vulkan via ANGLE/MobileGlues
         if (renderer.contains("ANGLE", ignoreCase = true) && renderer.contains("Vulkan", ignoreCase = true)) {
-            detectedGpu = renderer.substringBefore("|").trim()
+            detectedGpu       = renderer.substringBefore("|").trim()
             detectedVkVersion = Regex("Vulkan ([\\d.]+)").find(renderer)?.groupValues?.get(1) ?: "desconhecida"
             LOGGER.info("  ✅ ANGLE + MobileGlues detetado!")
             LOGGER.info("  GPU: $detectedGpu | Vulkan: $detectedVkVersion")
+
             val jniExts = MaliVulkanJNI.getExtensionsSafe()
-        if (jniExts.isNotEmpty()) {
-            VK_EXT_SET.addAll(jniExts)
-            LOGGER.info("  ✅ Vulkan REAL via JNI: ${jniExts.size} extensões!")
+            if (jniExts.isNotEmpty()) {
+                VK_EXT_SET.addAll(jniExts)
+                LOGGER.info("  ✅ Vulkan REAL via JNI: ${jniExts.size} extensões!")
+            } else {
+                LOGGER.warn("  ⚠️ JNI falhou — usando fallback hardcoded")
+                checkVulkanFallback()
+            }
             printVulkanReport()
-        } else {
-            checkVulkanFallback()
-        }
         }
 
-        // Ler extensões OpenGL
         try {
             val num = GL11.glGetInteger(GL30.GL_NUM_EXTENSIONS)
             for (i in 0 until num) {
@@ -193,14 +192,7 @@ object MaliHardware {
         else -> false
     }
 
-    private fun val jniExts = MaliVulkanJNI.getExtensionsSafe()
-        if (jniExts.isNotEmpty()) {
-            VK_EXT_SET.addAll(jniExts)
-            LOGGER.info("  ✅ Vulkan REAL via JNI: ${jniExts.size} extensões!")
-            printVulkanReport()
-        } else {
-            checkVulkanFallback()
-        } {
+    private fun checkVulkanFallback() {
         VK_EXT_SET.addAll(setOf(
             "VK_KHR_swapchain", "VK_KHR_maintenance1", "VK_KHR_maintenance2",
             "VK_KHR_maintenance3", "VK_KHR_bind_memory2", "VK_KHR_get_memory_requirements2",
@@ -228,7 +220,6 @@ object MaliHardware {
             "VK_GOOGLE_display_timing", "VK_KHR_device_group",
             "VK_KHR_external_memory", "VK_KHR_external_fence", "VK_KHR_external_semaphore"
         ))
-        printVulkanReport()
     }
 
     private fun printVulkanReport() {
@@ -237,7 +228,6 @@ object MaliHardware {
         LOGGER.info("  MALIOPT — RELATÓRIO VULKAN")
         LOGGER.info("  GPU: $detectedGpu")
         LOGGER.info("  Vulkan API: $detectedVkVersion")
-        LOGGER.info("  Fonte: ANGLE renderer string + lista confirmada Mali-G52")
         LOGGER.info("════════════════════════════════════════")
 
         var lastTier = ""
@@ -252,7 +242,7 @@ object MaliHardware {
             LOGGER.info("${if (present) "✅" else "❌"} ${vkExt.name}")
         }
         LOGGER.info("────────────────────────────────────────")
-        LOGGER.info("Vulkan: $found/${VK_MASTER_LIST.size} extensões confirmadas")
+        LOGGER.info("Vulkan: $found/${VK_MASTER_LIST.size} extensões detetadas")
         LOGGER.info("════════════════════════════════════════")
     }
 }
