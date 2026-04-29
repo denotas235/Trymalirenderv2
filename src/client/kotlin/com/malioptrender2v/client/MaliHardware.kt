@@ -144,7 +144,14 @@ object MaliHardware {
             detectedVkVersion = Regex("Vulkan ([\\d.]+)").find(renderer)?.groupValues?.get(1) ?: "desconhecida"
             LOGGER.info("  ✅ ANGLE + MobileGlues detetado!")
             LOGGER.info("  GPU: $detectedGpu | Vulkan: $detectedVkVersion")
+            val jniExts = MaliVulkanJNI.getExtensionsSafe()
+        if (jniExts.isNotEmpty()) {
+            VK_EXT_SET.addAll(jniExts)
+            LOGGER.info("  ✅ Vulkan REAL via JNI: ${jniExts.size} extensões!")
+            printVulkanReport()
+        } else {
             checkVulkanFallback()
+        }
         }
 
         // Ler extensões OpenGL
@@ -186,7 +193,14 @@ object MaliHardware {
         else -> false
     }
 
-    private fun checkVulkanFallback() {
+    private fun val jniExts = MaliVulkanJNI.getExtensionsSafe()
+        if (jniExts.isNotEmpty()) {
+            VK_EXT_SET.addAll(jniExts)
+            LOGGER.info("  ✅ Vulkan REAL via JNI: ${jniExts.size} extensões!")
+            printVulkanReport()
+        } else {
+            checkVulkanFallback()
+        } {
         VK_EXT_SET.addAll(setOf(
             "VK_KHR_swapchain", "VK_KHR_maintenance1", "VK_KHR_maintenance2",
             "VK_KHR_maintenance3", "VK_KHR_bind_memory2", "VK_KHR_get_memory_requirements2",
