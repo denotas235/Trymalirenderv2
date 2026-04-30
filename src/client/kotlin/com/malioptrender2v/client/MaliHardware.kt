@@ -119,9 +119,18 @@ object MaliHardware {
         VkExt("VK_KHR_sampler_ycbcr_conversion", "🔵 BAIXO")
     )
 
+    // ════════════════════════════════════════════════════════════════════════
+    //  Ponto de entrada
+    // ════════════════════════════════════════════════════════════════════════
+
     fun checkExtensions() {
-        checkOpenGL()
+        checkOpenGL()           // Sistema 1 — Via MobileGlues (intocado)
+        checkPluginExtensions() // Sistema 2 — Via Plugin (novo)
     }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  SISTEMA 1 — Via MobileGlues (código original, sem alterações)
+    // ════════════════════════════════════════════════════════════════════════
 
     private fun checkOpenGL() {
         GL_EXT_SET.clear()
@@ -131,7 +140,7 @@ object MaliHardware {
         val vendor    = GL11.glGetString(GL11.GL_VENDOR)   ?: ""
 
         LOGGER.info("════════════════════════════════════════")
-        LOGGER.info("  MALIOPT — INFO HARDWARE")
+        LOGGER.info("  MALIOPT — INFO HARDWARE (Via MobileGlues)")
         LOGGER.info("  Renderer: $renderer")
         LOGGER.info("  Version:  $glVersion")
         LOGGER.info("  Vendor:   $vendor")
@@ -168,7 +177,7 @@ object MaliHardware {
         hasFBFetch         = GL_EXT_SET.contains("GL_ARM_shader_framebuffer_fetch")
 
         LOGGER.info("════════════════════════════════════════")
-        LOGGER.info("  MALIOPT — RELATÓRIO OpenGL")
+        LOGGER.info("  MALIOPT — RELATÓRIO OpenGL (Via MobileGlues)")
         LOGGER.info("════════════════════════════════════════")
 
         var found = 0
@@ -225,7 +234,7 @@ object MaliHardware {
     private fun printVulkanReport() {
         vkAvailable = true
         LOGGER.info("════════════════════════════════════════")
-        LOGGER.info("  MALIOPT — RELATÓRIO VULKAN")
+        LOGGER.info("  MALIOPT — RELATÓRIO VULKAN (Via MobileGlues)")
         LOGGER.info("  GPU: $detectedGpu")
         LOGGER.info("  Vulkan API: $detectedVkVersion")
         LOGGER.info("════════════════════════════════════════")
@@ -243,6 +252,93 @@ object MaliHardware {
         }
         LOGGER.info("────────────────────────────────────────")
         LOGGER.info("Vulkan: $found/${VK_MASTER_LIST.size} extensões detetadas")
+        LOGGER.info("════════════════════════════════════════")
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  SISTEMA 2 — Via Plugin (novo, completamente independente)
+    // ════════════════════════════════════════════════════════════════════════
+
+    private fun checkPluginExtensions() {
+        LOGGER.info("════════════════════════════════════════")
+        LOGGER.info("  MALIOPT — VIA PLUGIN (Scan java.library.path)")
+        LOGGER.info("════════════════════════════════════════")
+
+        val pluginDir = MaliVulkanJNI.findPluginDir()
+        if (pluginDir == null) {
+            LOGGER.warn("  ⚠️ Nenhum plugin detetado no java.library.path.")
+            LOGGER.warn("  ⚠️ Instala o Plugin Vulkan MT6768 para ativar esta deteção.")
+            LOGGER.info("════════════════════════════════════════")
+            return
+        }
+
+        LOGGER.info("  Plugin dir: ${pluginDir.absolutePath}")
+
+        // 1. Carregar todas as .so do plugin
+        MaliVulkanJNI.loadPluginLibraries(pluginDir)
+
+        // 2. Extensões Vulkan — query por .so candidata
+        val vkExtsPerLib = MaliVulkanJNI.getPluginVulkanExtensions(pluginDir)
+        val vkExts: Set<String> = vkExtsPerLib.values
+            .fold(mutableSetOf()) { acc, s -> acc.addAll(s); acc }
+
+        // 3. Extensões GLES — pbuffer EGL isolado
+        val glExts = MaliVulkanJNI.getPluginGLESExtensions(pluginDir)
+
+        printPluginReport(glExts, vkExts, vkExtsPerLib)
+    }
+
+    private fun printPluginReport(
+        glExts: Set<String>,
+        vkExts: Set<String>,
+        vkExtsPerLib: Map<String, Set<String>>
+    ) {
+        // ── OpenGL ES via Plugin ─────────────────────────────────────────────
+        LOGGER.info("════════════════════════════════════════")
+        LOGGER.info("  MALIOPT — RELATÓRIO OpenGL ES (Via Plugin)")
+        LOGGER.info("════════════════════════════════════════")
+
+        if (glExts.isEmpty()) {
+            LOGGER.warn("  ⚠️ Nenhuma extensão GLES obtida via plugin.")
+            LOGGER.warn("  (libEGL.so ou libGLESv2.so ausentes ou context falhou)")
+        } else {
+            var foundGL = 0
+            GL_MASTER_LIST.forEach { ext ->
+                val present = glExts.contains(ext)
+                if (present) foundGL++
+                val active = if (isGLBeingUsed(ext)) " ⭐ MOD_ACTIVE" else ""
+                LOGGER.info("${if (present) "✅" else "❌"} $ext$active")
+            }
+            LOGGER.info("────────────────────────────────────────")
+            LOGGER.info("OpenGL ES (Plugin): $foundGL/${GL_MASTER_LIST.size} extensões detetadas")
+        }
+
+        // ── Vulkan via Plugin ────────────────────────────────────────────────
+        LOGGER.info("════════════════════════════════════════")
+        LOGGER.info("  MALIOPT — RELATÓRIO VULKAN (Via Plugin)")
+        LOGGER.info("════════════════════════════════════════")
+
+        if (vkExtsPerLib.isEmpty()) {
+            LOGGER.warn("  ⚠️ Nenhuma extensão Vulkan obtida via plugin.")
+            LOGGER.warn("  (Nenhum .so Vulkan/Mali encontrado ou vkCreateInstance falhou)")
+        } else {
+            LOGGER.info("  Libs Vulkan usadas: ${vkExtsPerLib.keys.joinToString(", ")}")
+            LOGGER.info("────────────────────────────────────────")
+
+            var lastTier = ""
+            var foundVK = 0
+            VK_MASTER_LIST.forEach { vkExt ->
+                if (vkExt.tier != lastTier) {
+                    LOGGER.info("── ${vkExt.tier} ──")
+                    lastTier = vkExt.tier
+                }
+                val present = vkExts.contains(vkExt.name)
+                if (present) foundVK++
+                LOGGER.info("${if (present) "✅" else "❌"} ${vkExt.name}")
+            }
+            LOGGER.info("────────────────────────────────────────")
+            LOGGER.info("Vulkan (Plugin): $foundVK/${VK_MASTER_LIST.size} extensões detetadas")
+        }
         LOGGER.info("════════════════════════════════════════")
     }
 }
